@@ -50,7 +50,10 @@ def dfs(start,end): #Ek cheez note karne ke lie ye hai ki dfs bht hi asaan hai l
         for neighbour,w in graph[city]:
             if neighbour in visited:
                 continue
+
             dfsrunner(neighbour,cost+w,path+[neighbour])
+
+            
         
         visited.remove(city)
     dfsrunner(start,0,[start])
@@ -70,7 +73,7 @@ for path, cost in results:
 
 #This input is AI generated based on the image provided in the assignment
 '''
-14 20
+14 22
 Chicago Detroit 283
 Chicago Cleveland 345
 Chicago Indianapolis 182
@@ -85,10 +88,12 @@ Syracuse Boston 312
 Syracuse New_York 254
 Boston Providence 50
 Boston Portland 107
+Syracuse Philadelphia 253
 Providence New_York 181
 New_York Philadelphia 97
 Philadelphia Baltimore 101
 Baltimore Pittsburgh 247
+Pittsburgh Cleveland 134
 Pittsburgh Buffalo 215
 Pittsburgh Philadelphia 305
 Syracuse Chicago
