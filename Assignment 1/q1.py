@@ -1,5 +1,23 @@
 from collections import defaultdict
-from collections import deque
+
+class Queue:
+    def __init__(self):
+        self.items = []
+    
+    def append(self, item):
+        self.items.append(item)
+    
+    def popleft(self):
+        if self.is_empty():
+            raise IndexError("Queue is empty")
+        return self.items.pop(0)
+    
+    def is_empty(self):
+        return len(self.items) == 0
+    
+    def __bool__(self):
+        return not self.is_empty()
+
 n,m=map(int,input().split())
 graph = defaultdict(list)
 
@@ -11,7 +29,7 @@ for _ in range(m):
 start,end=input().split()
 
 def bfs(start,end):
-    q=deque()
+    q=Queue()
     visited=set()
 
     q.append((start,0,[start]))  #Ye unordered_map jo upar banaya tha usse start ke saare neighbour leke unko push kar rhe hain 

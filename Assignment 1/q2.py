@@ -1,4 +1,27 @@
-from collections import deque,defaultdict
+from collections import defaultdict
+
+class Queue:
+    def __init__(self, initial_items=None):
+        self.items = []
+        if initial_items:
+            if isinstance(initial_items, list):
+                self.items = initial_items.copy()
+            else:
+                self.items = [initial_items]
+    
+    def append(self, item):
+        self.items.append(item)
+    
+    def popleft(self):
+        if self.is_empty():
+            raise IndexError("Queue is empty")
+        return self.items.pop(0)
+    
+    def is_empty(self):
+        return len(self.items) == 0
+    
+    def __bool__(self):
+        return not self.is_empty()
 
 n,m=map(int,input().split())
 
@@ -12,7 +35,7 @@ for _ in range(m):
 start=input().strip()
 
 def bfs(start):
-    q=deque([start])
+    q=Queue([start])
     visited=set()
     visited.add(start)
 
