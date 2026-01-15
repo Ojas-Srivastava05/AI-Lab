@@ -51,14 +51,7 @@ def find_all_dfs_routes(network, origin, destination, route=None, distance=0, al
 
     for next_node, edge_weight in network[origin]:
         if next_node not in route:
-            find_all_dfs_routes(
-                network,
-                next_node,
-                destination,
-                route + [next_node],
-                distance + edge_weight,
-                all_routes
-            )
+            find_all_dfs_routes(network,next_node,destination,route + [next_node],distance + edge_weight,all_routes)
 
     return all_routes
 
