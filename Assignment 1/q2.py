@@ -49,7 +49,7 @@ def depth_first(connections, start_node, seen=None, traversal=None):
     return traversal
 
 #printing results 
-starting_point = "Priya"
+starting_point = "Neha"
 
 bfs_output = breadth_first(connections, starting_point)
 dfs_output = depth_first(connections, starting_point)
