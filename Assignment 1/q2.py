@@ -1,5 +1,3 @@
-
-
 #BFS
 def breadth_first(connections, start_node):
     seen = set()
@@ -18,6 +16,7 @@ def breadth_first(connections, start_node):
                 q.append(adjacent)
 
     return traversal
+
 
 #DFS
 def depth_first(connections, start_node, seen=None, traversal=None):
