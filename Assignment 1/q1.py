@@ -1,3 +1,20 @@
+network = {
+    "Chicago": [("Detroit", 283), ("Cleveland", 345), ("Indianapolis", 182)],
+    "Indianapolis": [("Chicago", 182), ("Columbus", 176)],
+    "Columbus": [("Indianapolis", 176), ("Cleveland", 144), ("Pittsburgh", 185)],
+    "Cleveland": [("Chicago", 345), ("Detroit", 169), ("Buffalo", 189), ("Columbus", 144), ("Pittsburgh", 134)],
+    "Detroit": [("Chicago", 283), ("Cleveland", 169), ("Buffalo", 256)],
+    "Buffalo": [("Detroit", 256), ("Cleveland", 189), ("Syracuse", 150), ("Pittsburgh", 215)],
+    "Pittsburgh": [("Cleveland", 134), ("Buffalo", 215), ("Columbus", 185), ("Philadelphia", 305), ("Baltimore", 247)],
+    "Baltimore": [("Pittsburgh", 247), ("Philadelphia", 101)],
+    "Philadelphia": [("Baltimore", 101), ("New York", 97), ("Syracuse", 253)],
+    "New York": [("Philadelphia", 97), ("Boston", 215), ("Providence", 181)],
+    "Providence": [("New York", 181), ("Boston", 50)],
+    "Boston": [("Providence", 50), ("Syracuse", 312), ("Portland", 107), ("New York", 215)],
+    "Portland": [("Boston", 107)],
+    "Syracuse": [("Buffalo", 150), ("Boston", 312), ("Philadelphia", 253)]
+}
+
 #defining Queue
 class Queue:
     def __init__(self):
@@ -55,22 +72,7 @@ def find_all_dfs_routes(network, origin, destination, route=None, distance=0, al
 
     return all_routes
 
-network = {
-    "Chicago": [("Detroit", 283), ("Cleveland", 345), ("Indianapolis", 182)],
-    "Indianapolis": [("Chicago", 182), ("Columbus", 176)],
-    "Columbus": [("Indianapolis", 176), ("Cleveland", 144), ("Pittsburgh", 185)],
-    "Cleveland": [("Chicago", 345), ("Detroit", 169), ("Buffalo", 189), ("Columbus", 144), ("Pittsburgh", 134)],
-    "Detroit": [("Chicago", 283), ("Cleveland", 169), ("Buffalo", 256)],
-    "Buffalo": [("Detroit", 256), ("Cleveland", 189), ("Syracuse", 150), ("Pittsburgh", 215)],
-    "Pittsburgh": [("Cleveland", 134), ("Buffalo", 215), ("Columbus", 185), ("Philadelphia", 305), ("Baltimore", 247)],
-    "Baltimore": [("Pittsburgh", 247), ("Philadelphia", 101)],
-    "Philadelphia": [("Baltimore", 101), ("New York", 97), ("Syracuse", 253)],
-    "New York": [("Philadelphia", 97), ("Boston", 215), ("Providence", 181)],
-    "Providence": [("New York", 181), ("Boston", 50)],
-    "Boston": [("Providence", 50), ("Syracuse", 312), ("Portland", 107), ("New York", 215)],
-    "Portland": [("Boston", 107)],
-    "Syracuse": [("Buffalo", 150), ("Boston", 312), ("Philadelphia", 253)]
-}
+
 
 origin = "Syracuse"
 destination = "Chicago"

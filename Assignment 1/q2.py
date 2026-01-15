@@ -1,17 +1,4 @@
-#defining graph 
-connections = {
-    "Priya": ["Raj", "Aarav", "Neha", "Akash"],
-    "Raj": ["Priya", "Sunil"],
-    "Aarav": ["Priya", "Neha", "Arjun"],
-    "Akash": ["Priya", "Sunil", "Neha"],
-    "Sunil": ["Raj", "Akash", "Sneha"],
-    "Neha": ["Priya", "Aarav", "Akash", "Rahul"],
-    "Sneha": ["Sunil", "Rahul", "Maya"],
-    "Rahul": ["Neha", "Sneha", "Arjun", "Pooja"],
-    "Maya": ["Sneha"],
-    "Arjun": ["Aarav", "Rahul", "Pooja"],
-    "Pooja": ["Rahul", "Arjun"]
-}
+
 
 #BFS
 def breadth_first(connections, start_node):
@@ -47,6 +34,22 @@ def depth_first(connections, start_node, seen=None, traversal=None):
             depth_first(connections, adjacent, seen, traversal)
 
     return traversal
+
+
+#defining graph 
+connections = {
+    "Priya": ["Raj", "Aarav", "Neha", "Akash"],
+    "Raj": ["Priya", "Sunil"],
+    "Aarav": ["Priya", "Neha", "Arjun"],
+    "Akash": ["Priya", "Sunil", "Neha"],
+    "Sunil": ["Raj", "Akash", "Sneha"],
+    "Neha": ["Priya", "Aarav", "Akash", "Rahul"],
+    "Sneha": ["Sunil", "Rahul", "Maya"],
+    "Rahul": ["Neha", "Sneha", "Arjun", "Pooja"],
+    "Maya": ["Sneha"],
+    "Arjun": ["Aarav", "Rahul", "Pooja"],
+    "Pooja": ["Rahul", "Arjun"]
+}
 
 #printing results 
 starting_point = "Neha"
