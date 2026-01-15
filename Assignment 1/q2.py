@@ -1,105 +1,61 @@
-from collections import defaultdict
+#defining graph 
+connections = {
+    "Priya": ["Raj", "Aarav", "Neha", "Akash"],
+    "Raj": ["Priya", "Sunil"],
+    "Aarav": ["Priya", "Neha", "Arjun"],
+    "Akash": ["Priya", "Sunil", "Neha"],
+    "Sunil": ["Raj", "Akash", "Sneha"],
+    "Neha": ["Priya", "Aarav", "Akash", "Rahul"],
+    "Sneha": ["Sunil", "Rahul", "Maya"],
+    "Rahul": ["Neha", "Sneha", "Arjun", "Pooja"],
+    "Maya": ["Sneha"],
+    "Arjun": ["Aarav", "Rahul", "Pooja"],
+    "Pooja": ["Rahul", "Arjun"]
+}
 
-class Queue:
-    def __init__(self, initial_items=None):
-        self.items = []
-        if initial_items:
-            if isinstance(initial_items, list):
-                self.items = initial_items.copy()
-            else:
-                self.items = [initial_items]
-    
-    def append(self, item):
-        self.items.append(item)
-    
-    def popleft(self):
-        if self.is_empty():
-            raise IndexError("Queue is empty")
-        return self.items.pop(0)
-    
-    def is_empty(self):
-        return len(self.items) == 0
-    
-    def __bool__(self):
-        return not self.is_empty()
+#BFS
+def breadth_first(connections, start_node):
+    seen = set()
+    q = [start_node]
+    traversal = []
 
-n,m=map(int,input().split())
-
-graph = defaultdict(list)
-
-for _ in range(m):
-    u,v=input().split()
-    graph[u].append(v)
-    graph[v].append(u)
-
-start=input().strip()
-
-def bfs(start):
-    q=Queue([start])
-    visited=set()
-    visited.add(start)
-
-    bfsorder=[]
+    seen.add(start_node)
 
     while q:
-        person=q.popleft()
-        bfsorder.append(person)
+        curr = q.pop(0)
+        traversal.append(curr)
 
-        for neighbour in graph[person]:
-            if neighbour not in visited:
-                visited.add(neighbour)
-                q.append(neighbour)
+        for adjacent in connections[curr]:
+            if adjacent not in seen:
+                seen.add(adjacent)
+                q.append(adjacent)
 
-    return bfsorder
+    return traversal
 
-def dfs(start):
-    visited=set()
-    dfsorder=[]
+#DFS
+def depth_first(connections, start_node, seen=None, traversal=None):
+    if seen is None:
+        seen = set()
+    if traversal is None:
+        traversal = []
 
-    def dfsrunner(person):
-        visited.add(person)
+    seen.add(start_node)
+    traversal.append(start_node)
 
-        for neighbour in graph[person]:
-            if neighbour in visited:
-                continue
+    for adjacent in connections[start_node]:
+        if adjacent not in seen:
+            depth_first(connections, adjacent, seen, traversal)
 
-            dfsorder.append(neighbour)
-            dfsrunner(neighbour)
-    
-    dfsrunner(start)
-    return dfsorder
+    return traversal
 
-bfs_result = bfs(start)
-dfs_result = dfs(start)
+#printing results 
+starting_point = "Priya"
 
-print("\nBFS Traversal:")
-print(" -> ".join(bfs_result))
+bfs_output = breadth_first(connections, starting_point)
+dfs_output = depth_first(connections, starting_point)
+
+print("BFS Traversal:")
+print(bfs_output)
 
 print("\nDFS Traversal:")
-print(" -> ".join(dfs_result))
-
-# ai generated input based on the image
-'''
-13 20
-Raj Priya
-Raj Sunil
-Priya Aarav
-Priya Akash
-Priya Neha1
-Aarav Neha2
-Sunil Akash
-Sunil Sneha
-Akash Neha1
-Neha1 Neha2
-Neha1 Rahul
-Neha2 Arjun
-Rahul Sneha
-Rahul Arjun
-Sneha Maya
-Maya Pooja2
-Pooja2 Rahul
-Pooja2 Pooja1
-Pooja1 Arjun
-Neha2 Pooja1
-Raj
-'''
+print(dfs_output)

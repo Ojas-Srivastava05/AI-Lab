@@ -1,118 +1,95 @@
-from collections import defaultdict
-
+#defining Queue
 class Queue:
     def __init__(self):
-        self.items = []
+        self.elements = []
+
+    def add(self, element):
+       
+        self.elements = self.elements + [element]
+
+    def remove(self):
+      
+        if self.check_empty():
+            return None
+
+        first = self.elements[0]
+        self.elements = self.elements[1:]
+        return first
+
+    def check_empty(self):
+        return len(self.elements) == 0
     
-    def append(self, item):
-        self.items.append(item)
-    
-    def popleft(self):
-        if self.is_empty():
-            raise IndexError("Queue is empty")
-        return self.items.pop(0)
-    
-    def is_empty(self):
-        return len(self.items) == 0
-    
-    def __bool__(self):
-        return not self.is_empty()
+#BFS
+def find_all_bfs_routes(network, origin, destination):
+        queue = Queue()
+        queue.add((origin, [origin], 0))
+        all_routes = []
 
-n,m=map(int,input().split())
-graph = defaultdict(list)
+        while not queue.check_empty():
+            node, route, distance = queue.remove()
 
-for _ in range(m):
-    u,v,w=input().split()
-    graph[u].append((v,int(w)))
-    graph[v].append((u,int(w)))
-
-start,end=input().split()
-
-def bfs(start,end):
-    q=Queue()
-    visited=set()
-
-    q.append((start,0,[start]))  #Ye unordered_map jo upar banaya tha usse start ke saare neighbour leke unko push kar rhe hain 
-    #jaise hum cpp mei start waale ko queue mei daal dete the waise ye kia jaara hai
-
-    all_costs=[] #ye vector banaya hai aisa socho jisme saari costs append kar denge
-
-    while q:  #while(!q.empty()) kia hai 
-        city,cost,path=q.popleft()
-        if city==end:
-            all_costs.append((path,cost))
-            continue
-
-        if city in visited:
-            continue # agar woh city already visited hai toh path overlap ho jaaega islie aage badh jaao
-        
-        visited.add(city)
-
-        for neighbour,w in graph[city]:
-            if neighbour not in visited:
-                q.append((neighbour,cost+w,path+[neighbour]))
-
-    return all_costs
-
-
-def dfs(start,end): #Ek cheez note karne ke lie ye hai ki dfs bht hi asaan hai likhna python mei as compared to bfs kyunki bfs mei apan koi bhi visited ka set nhi lete the cpp mei but yha hume lena pada dono bfs and dfs ke lie
-    visited=set()
-    result=[]
-    def dfsrunner(city,cost,path):
-        if city==end:
-            result.append((path.copy(),cost))
-            return
-        
-        visited.add(city)
-
-        for neighbour,w in graph[city]:
-            if neighbour in visited:
+            if node == destination:
+                all_routes.append((route, distance))
                 continue
 
-            dfsrunner(neighbour,cost+w,path+[neighbour])
+            for next_node, edge_weight in network[node]:
+                if next_node not in route:
+                    queue.add((next_node, route + [next_node], distance + edge_weight))
 
-            
-        
-        visited.remove(city)
-    dfsrunner(start,0,[start])
-    return result
+        return all_routes
 
-paths=dfs(start,end)
-print("All possible DFS paths and costs:")
-for path, cost in paths:
-    print(" -> ".join(path), " | Cost =", cost) #ye printing format yaad karle aage bht kaam aaega join waala
+#DFS
+def find_all_dfs_routes(network, origin, destination, route=None, distance=0, all_routes=None):
+    if route is None:
+        route = [origin]
+    if all_routes is None:
+        all_routes = []
 
-results = bfs(start, end)
+    if origin == destination:
+        all_routes.append((route, distance))
+        return all_routes
 
-print("All possible BFS paths and costs:")
-for path, cost in results:
-    print(" -> ".join(path), " | Cost =", cost)
+    for next_node, edge_weight in network[origin]:
+        if next_node not in route:
+            find_all_dfs_routes(
+                network,
+                next_node,
+                destination,
+                route + [next_node],
+                distance + edge_weight,
+                all_routes
+            )
+
+    return all_routes
+
+network = {
+    "Chicago": [("Detroit", 283), ("Cleveland", 345), ("Indianapolis", 182)],
+    "Indianapolis": [("Chicago", 182), ("Columbus", 176)],
+    "Columbus": [("Indianapolis", 176), ("Cleveland", 144), ("Pittsburgh", 185)],
+    "Cleveland": [("Chicago", 345), ("Detroit", 169), ("Buffalo", 189), ("Columbus", 144), ("Pittsburgh", 134)],
+    "Detroit": [("Chicago", 283), ("Cleveland", 169), ("Buffalo", 256)],
+    "Buffalo": [("Detroit", 256), ("Cleveland", 189), ("Syracuse", 150), ("Pittsburgh", 215)],
+    "Pittsburgh": [("Cleveland", 134), ("Buffalo", 215), ("Columbus", 185), ("Philadelphia", 305), ("Baltimore", 247)],
+    "Baltimore": [("Pittsburgh", 247), ("Philadelphia", 101)],
+    "Philadelphia": [("Baltimore", 101), ("New York", 97), ("Syracuse", 253)],
+    "New York": [("Philadelphia", 97), ("Boston", 215), ("Providence", 181)],
+    "Providence": [("New York", 181), ("Boston", 50)],
+    "Boston": [("Providence", 50), ("Syracuse", 312), ("Portland", 107), ("New York", 215)],
+    "Portland": [("Boston", 107)],
+    "Syracuse": [("Buffalo", 150), ("Boston", 312), ("Philadelphia", 253)]
+}
+
+origin = "Syracuse"
+destination = "Chicago"
 
 
-#This input is AI generated based on the image provided in the assignment
-'''
-14 22
-Chicago Detroit 283
-Chicago Cleveland 345
-Chicago Indianapolis 182
-Indianapolis Columbus 176
-Columbus Cleveland 144
-Columbus Pittsburgh 185
-Cleveland Detroit 169
-Cleveland Buffalo 189
-Detroit Buffalo 256
-Buffalo Syracuse 150
-Syracuse Boston 312
-Syracuse New_York 254
-Boston Providence 50
-Boston Portland 107
-Syracuse Philadelphia 253
-Providence New_York 181
-New_York Philadelphia 97
-Philadelphia Baltimore 101
-Baltimore Pittsburgh 247
-Pittsburgh Cleveland 134
-Pittsburgh Buffalo 215
-Pittsburgh Philadelphia 305
-Syracuse Chicago
-'''
+breadth_first_routes = find_all_bfs_routes(network, origin, destination)
+depth_first_routes = find_all_dfs_routes(network, origin, destination)
+
+print("BFS Routes:")
+for route, distance in breadth_first_routes:
+    print(route, "Distance:", distance)
+
+print("\nDFS Routes:")
+for route, distance in depth_first_routes:
+    print(route, "Distance:", distance)
