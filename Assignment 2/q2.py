@@ -1,33 +1,20 @@
-"""
-8-Puzzle Problem - DFS Solution
-Question 2: Find the number of states explored for DFS and compare with BFS
-"""
-
 from collections import deque
 
 class Puzzle8:
     def __init__(self, state):
-        """
-        Initialize the puzzle with a 3x3 state
-        state: list of lists representing the puzzle board
-        """
         self.state = state
         self.size = 3
     
     def __eq__(self, other):
-        """Check if two puzzle states are equal"""
         return self.state == other.state
     
     def __hash__(self):
-        """Make puzzle hashable for use in sets"""
         return hash(tuple(tuple(row) for row in self.state))
     
     def __str__(self):
-        """String representation of the puzzle"""
         return '\n'.join([' '.join(map(str, row)) for row in self.state])
     
     def find_blank(self):
-        """Find the position of the blank tile (represented as 0 or None)"""
         for i in range(self.size):
             for j in range(self.size):
                 if self.state[i][j] == 0 or self.state[i][j] is None:
@@ -35,131 +22,104 @@ class Puzzle8:
         return None
     
     def get_neighbors(self):
-        """Generate all possible next states by moving the blank tile"""
-        blank_row, blank_col = self.find_blank()
-        neighbors = []
-        
-        # Possible moves: up, down, left, right
+        br, bc = self.find_blank()
+        neighs = []
         moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
         
-        for dr, dc in moves:
-            new_row = blank_row + dr
-            new_col = blank_col + dc
+        for dx, dy in moves:
+            nr = br + dx
+            nc = bc + dy
             
-            # Check if move is valid
-            if 0 <= new_row < self.size and 0 <= new_col < self.size:
-                # Create a new state by swapping blank with adjacent tile
-                new_state = [row[:] for row in self.state]  # Deep copy
-                new_state[blank_row][blank_col] = new_state[new_row][new_col]
-                new_state[new_row][new_col] = 0
-                neighbors.append(Puzzle8(new_state))
+            if 0 <= nr < self.size and 0 <= nc < self.size:
+                new = [row[:] for row in self.state]
+                new[br][bc] = new[nr][nc]
+                new[nr][nc] = 0
+                neighs.append(Puzzle8(new))
         
-        return neighbors
+        return neighs
 
-def bfs(start_state, goal_state):
-    """
-    Breadth-First Search to solve 8-puzzle
-    Returns: (path, number of states explored, total cost)
-    """
-    start = Puzzle8(start_state)
-    goal = Puzzle8(goal_state)
+def bfs(s, g):
+    start = Puzzle8(s)
+    goal = Puzzle8(g)
     
-    # If start is already the goal
     if start == goal:
         return [start], 1, 0
     
-    # Initialize BFS
-    queue = deque([start])
-    visited = {start}
-    parent = {start: None}
-    depth = {start: 0}
-    states_explored = 0
+    q = deque([start])
+    seen = {start}
+    prev = {start: None}
+    d = {start: 0}
+    count = 0
     
-    while queue:
-        current = queue.popleft()
-        states_explored += 1
+    while q:
+        curr = q.popleft()
+        count += 1
         
-        # Check if we reached the goal
-        if current == goal:
-            # Reconstruct path
+        if curr == goal:
             path = []
-            node = current
+            node = curr
             while node is not None:
                 path.append(node)
-                node = parent[node]
+                node = prev[node]
             path.reverse()
-            total_cost = depth[current]  # Cost = depth of goal state
-            return path, states_explored, total_cost
+            cost = d[curr]
+            return path, count, cost
         
-        # Explore neighbors
-        for neighbor in current.get_neighbors():
-            if neighbor not in visited:
-                visited.add(neighbor)
-                parent[neighbor] = current
-                depth[neighbor] = depth[current] + 1
-                queue.append(neighbor)
+        for n in curr.get_neighbors():
+            if n not in seen:
+                seen.add(n)
+                prev[n] = curr
+                d[n] = d[curr] + 1
+                q.append(n)
     
-    return None, states_explored, float('inf')  # No solution found
+    return None, count, float('inf')
 
-def dfs(start_state, goal_state, max_depth=50):
-    """
-    Depth-First Search to solve 8-puzzle
-    Returns: (path, number of states explored, total cost)
-    """
-    start = Puzzle8(start_state)
-    goal = Puzzle8(goal_state)
+def dfs(s, g, max_d=50):
+    start = Puzzle8(s)
+    goal = Puzzle8(g)
     
-    # If start is already the goal
     if start == goal:
         return [start], 1, 0
     
-    # Initialize DFS
-    stack = [(start, 0)]  # (state, depth)
-    visited = set()
-    parent = {start: None}
-    depth = {start: 0}
-    states_explored = 0
+    stack = [(start, 0)]
+    seen = set()
+    prev = {start: None}
+    d = {start: 0}
+    count = 0
     
     while stack:
-        current, current_depth = stack.pop()
-        states_explored += 1
+        curr, cd = stack.pop()
+        count += 1
         
-        # Check if we reached the goal
-        if current == goal:
-            # Reconstruct path
+        if curr == goal:
             path = []
-            node = current
+            node = curr
             while node is not None:
                 path.append(node)
-                node = parent[node]
+                node = prev[node]
             path.reverse()
-            total_cost = depth[current]  # Cost = depth of goal state
-            return path, states_explored, total_cost
+            cost = d[curr]
+            return path, count, cost
         
-        # Skip if max depth reached
-        if current_depth >= max_depth:
+        if cd >= max_d:
             continue
         
-        # Only explore if not visited at this depth or at a shallower depth
-        if current not in visited:
-            visited.add(current)
+        if curr not in seen:
+            seen.add(curr)
+            neighs = curr.get_neighbors()
+            neighs.reverse()
             
-            # Explore neighbors (reverse order for more natural exploration)
-            neighbors = current.get_neighbors()
-            neighbors.reverse()  # DFS typically explores in reverse order
-            
-            for neighbor in neighbors:
-                if neighbor not in visited:
-                    parent[neighbor] = current
-                    depth[neighbor] = depth[current] + 1
-                    stack.append((neighbor, current_depth + 1))
+            for n in neighs:
+                if n not in seen:
+                    prev[n] = curr
+                    d[n] = d[curr] + 1
+                    stack.append((n, cd + 1))
     
-    return None, states_explored, float('inf')  # No solution found
+    return None, count, float('inf')
 
-# Define start and goal states
 start_state = [
     [7, 2, 4],
-    [5, 0, 6],  # 0 represents the blank tile
+    [5, 0, 6],
     [8, 3, 1]
 ]
 
@@ -178,51 +138,48 @@ if __name__ == "__main__":
     print(Puzzle8(goal_state))
     print("\n" + "=" * 50)
     
-    # Run BFS
     print("\n" + "-" * 50)
     print("BFS (Breadth-First Search):")
     print("-" * 50)
-    bfs_path, bfs_states, bfs_cost = bfs(start_state, goal_state)
+    bp, bc, bcost = bfs(start_state, goal_state)
     
-    if bfs_path:
+    if bp:
         print(f"Solution found!")
-        print(f"Number of states explored: {bfs_states}")
-        print(f"Path length (number of moves): {len(bfs_path) - 1}")
-        print(f"Total cost (depth): {bfs_cost}")
+        print(f"Number of states explored: {bc}")
+        print(f"Path length (number of moves): {len(bp) - 1}")
+        print(f"Total cost (depth): {bcost}")
     else:
         print("No solution found!")
-        print(f"Number of states explored: {bfs_states}")
+        print(f"Number of states explored: {bc}")
     
-    # Run DFS
     print("\n" + "-" * 50)
     print("DFS (Depth-First Search):")
     print("-" * 50)
-    dfs_path, dfs_states, dfs_cost = dfs(start_state, goal_state, max_depth=50)
+    dp, dc, dcost = dfs(start_state, goal_state, max_d=50)
     
-    if dfs_path:
+    if dp:
         print(f"Solution found!")
-        print(f"Number of states explored: {dfs_states}")
-        print(f"Path length (number of moves): {len(dfs_path) - 1}")
-        print(f"Total cost (depth): {dfs_cost}")
+        print(f"Number of states explored: {dc}")
+        print(f"Path length (number of moves): {len(dp) - 1}")
+        print(f"Total cost (depth): {dcost}")
     else:
         print("No solution found!")
-        print(f"Number of states explored: {dfs_states}")
+        print(f"Number of states explored: {dc}")
     
-    # Comparison
     print("\n" + "=" * 50)
     print("COMPARISON: BFS vs DFS")
     print("=" * 50)
     
-    if bfs_path and dfs_path:
+    if bp and dp:
         print(f"\nStates Explored:")
-        print(f"  BFS: {bfs_states} states")
-        print(f"  DFS: {dfs_states} states")
-        print(f"  Difference: {abs(bfs_states - dfs_states)} states")
+        print(f"  BFS: {bc} states")
+        print(f"  DFS: {dc} states")
+        print(f"  Difference: {abs(bc - dc)} states")
         
         print(f"\nPath Cost (Depth):")
-        print(f"  BFS: {bfs_cost} (optimal - shortest path)")
-        print(f"  DFS: {dfs_cost} (may not be optimal)")
-        print(f"  Difference: {abs(bfs_cost - dfs_cost)}")
+        print(f"  BFS: {bcost} (optimal - shortest path)")
+        print(f"  DFS: {dcost} (may not be optimal)")
+        print(f"  Difference: {abs(bcost - dcost)}")
         
         print(f"\nKey Observations:")
         print(f"  1. BFS explores states level by level, guaranteeing optimal solution")
@@ -230,9 +187,9 @@ if __name__ == "__main__":
         print(f"  3. BFS typically explores more states but finds shorter paths")
         print(f"  4. DFS may explore fewer states but path cost is usually higher")
         
-        if bfs_cost < dfs_cost:
+        if bcost < dcost:
             print(f"\n  → BFS found a more optimal solution (lower cost)")
-        elif dfs_cost < bfs_cost:
+        elif dcost < bcost:
             print(f"\n  → DFS found a more optimal solution (lower cost)")
         else:
             print(f"\n  → Both found solutions with the same cost")
