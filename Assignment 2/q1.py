@@ -1,33 +1,20 @@
-"""
-8-Puzzle Problem - BFS Solution
-Question 1: Find the number of states explored before reaching the goal state using BFS
-"""
-
 from collections import deque
 
 class Puzzle8:
     def __init__(self, state):
-        """
-        Initialize the puzzle with a 3x3 state
-        state: list of lists representing the puzzle board
-        """
         self.state = state
         self.size = 3
     
     def __eq__(self, other):
-        """Check if two puzzle states are equal"""
         return self.state == other.state
     
     def __hash__(self):
-        """Make puzzle hashable for use in sets"""
         return hash(tuple(tuple(row) for row in self.state))
     
     def __str__(self):
-        """String representation of the puzzle"""
         return '\n'.join([' '.join(map(str, row)) for row in self.state])
     
     def find_blank(self):
-        """Find the position of the blank tile (represented as 0 or None)"""
         for i in range(self.size):
             for j in range(self.size):
                 if self.state[i][j] == 0 or self.state[i][j] is None:
@@ -35,7 +22,6 @@ class Puzzle8:
         return None
     
     def get_neighbors(self):
-        """Generate all possible next states by moving the blank tile"""
         blank_row, blank_col = self.find_blank()
         neighbors = []
         
@@ -57,10 +43,6 @@ class Puzzle8:
         return neighbors
 
 def bfs(start_state, goal_state):
-    """
-    Breadth-First Search to solve 8-puzzle
-    Returns: (path, number of states explored)
-    """
     start = Puzzle8(start_state)
     goal = Puzzle8(goal_state)
     
