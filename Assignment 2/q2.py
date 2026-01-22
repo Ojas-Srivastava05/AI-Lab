@@ -1,5 +1,3 @@
-from collections import deque
-
 class Puzzle8:
     def __init__(self, state):
         self.state = state
@@ -45,14 +43,14 @@ def bfs(s, g):
     if start == goal:
         return [start], 1, 0
     
-    q = deque([start])
+    q = [start]
     seen = {start}
     prev = {start: None}
     d = {start: 0}
     count = 0
     
     while q:
-        curr = q.popleft()
+        curr = q.pop(0)
         count += 1
         
         if curr == goal:
