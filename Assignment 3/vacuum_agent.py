@@ -16,9 +16,9 @@ class VacuumEnvironment:
 
     def step(self, action):
         cost = 0
-        if action == 'Suck':
+        if action == 'Clean':
             cost = -2
-            print(f"Action: SUCK at {self.agent_loc}")
+            print(f"Action: CLEAN at {self.agent_loc}")
             self.location_condition[self.agent_loc] = 0
         elif action == 'Right':
             cost = -1
@@ -48,7 +48,7 @@ class VacuumEnvironment:
 def simple_reflex_agent(percept):
     loc, status = percept
     if status == 1: # Dirty
-        return 'Suck'
+        return 'Clean'
     
     if loc == 'A':
         return 'Right'
