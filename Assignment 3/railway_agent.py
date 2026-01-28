@@ -15,42 +15,30 @@ class RailwayCrossingEnvironment:
         return self.inputs
 
 def railway_reflex_agent(percepts):
-    # Percepts: dict with boolean values
     train = percepts['Train_Detected']
     obstacle = percepts['Obstacle_Detected']
     emergency = percepts['Emergency_Manual']
     
-    # Actuators default state (Safe-fail: Red, Open, Hooter On is panic mode)
-    # Let's define safe defaults clearly.
     action = {
         'Gate': 'Unknown',
         'Hooter': 'Unknown',
         'Signal': 'Unknown'
     }
     
-    # Priority Rule Implementation
-    # 1. Critical Safety: Emergency Manual Override OR Obstacle on Track
     if emergency or obstacle:
-        # If train is coming or not, we MUST stopping train if possible (Signal Red)
-        # And we must Open gate to let obstacle escape if possible? 
-        # Actually standard procedure for Obstacle: Signal RED, Gate OPEN (to let exit), Hooter ON
         action['Signal'] = 'RED'
         action['Hooter'] = 'ON'
         action['Gate'] = 'OPEN' 
-        # Rationale: If stuck, raising gate allows escape. Red signal stops train.
         
-    # 2. Normal Operation: Train Aproaching, No Obstacles, No Emergency
     elif train:
-        action['Signal'] = 'GREEN' # Safe for train to proceed (after gate closed)
-        action['Hooter'] = 'ON'    # Warn traffic
-        action['Gate'] = 'CLOSED'  # Stop road traffic
+        action['Signal'] = 'GREEN'
+        action['Hooter'] = 'ON'
+        action['Gate'] = 'CLOSED'
         
-    # 3. Idle: No Train, No Obstacle
     else:
-        action['Signal'] = 'RED'   # Railway signal usually red if block not claimed, or Green?
-                                   # Let's say RED for train (Stop), allowing Road Traffic.
+        action['Signal'] = 'RED'
         action['Hooter'] = 'OFF'
-        action['Gate'] = 'OPEN'    # Road traffic allowed
+        action['Gate'] = 'OPEN'
         
     return action
 
@@ -63,23 +51,21 @@ def run_railway_simulation():
     print(f"{'Train':<10} | {'Obstacle':<10} | {'Emergency':<10} || {'Signal':<10} | {'Gate':<10} | {'Hooter':<10}")
     print("-" * 60)
     
-    # Truth Table Simulation (All 8 combinations)
     scenarios = [
         (False, False, False),
         (False, False, True),
         (False, True, False),
-        (False, True, True), # emergency + obstacle
-        (True, False, False), # Normal, Train coming
-        (True, False, True),  # Train + Emergency
-        (True, True, False),  # Train + Obstacle (Critical!)
-        (True, True, True),   # Max Chaos
+        (False, True, True),
+        (True, False, False),
+        (True, False, True),
+        (True, True, False),
+        (True, True, True),
     ]
     
     for t, o, e in scenarios:
         percepts = env.set_inputs(t, o, e)
         action = railway_reflex_agent(percepts)
         
-        # Formatting output
         t_str = str(t)
         o_str = str(o)
         e_str = str(e)

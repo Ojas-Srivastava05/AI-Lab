@@ -2,7 +2,6 @@ import random
 
 class VacuumEnvironment:
     def __init__(self):
-        # 3 Rooms: A, B, C. 0 = Clean, 1 = Dirty
         self.location_map = ['A', 'B', 'C']
         self.state = {
             'A': random.choice([0, 1]),
@@ -14,19 +13,14 @@ class VacuumEnvironment:
         self.step_count = 0
 
     def get_percept(self):
-        # Percept: [Location, Status]
         return (self.agent_location, 'Dirty' if self.state[self.agent_location] == 1 else 'Clean')
 
     def execute_action(self, action):
         self.step_count += 1
-        # Performance Cost Definition:
-        # +10 for each Clean room at end of step (Maintenance)
-        # -1 for each Move (Energy Cost)
-        # -2 for Suck execution (Energy Cost) 
         
         cost = 0
         if action == 'Suck':
-            self.state[self.agent_location] = 0 # Make Clean
+            self.state[self.agent_location] = 0 
             cost = -2
             print(f"Action: SUCK in {self.agent_location}")
         elif action == 'Right':
@@ -34,31 +28,21 @@ class VacuumEnvironment:
             print(f"Action: MOVE RIGHT from {self.agent_location}")
             if self.agent_location == 'A': self.agent_location = 'B'
             elif self.agent_location == 'B': self.agent_location = 'C'
-            # C -> Right stays in C (Wall)
         elif action == 'Left':
             cost = -1
             print(f"Action: MOVE LEFT from {self.agent_location}")
             if self.agent_location == 'C': self.agent_location = 'B'
             elif self.agent_location == 'B': self.agent_location = 'A'
-            # A -> Left stays in A (Wall)
         elif action == 'NoOp':
             print("Action: NoOp")
             cost = 0
 
-        # Reward for purely being clean
         clean_bonus = sum(10 for room in ['A', 'B', 'C'] if self.state[room] == 0)
         self.performance_score += (cost + clean_bonus)
         
         return self.get_percept()
 
 def simple_reflex_agent(percept):
-    # Rule Table stored effectively as logic here.
-    # Rules:
-    # 1. If Dirty -> Suck
-    # 2. If Clean and A -> Right
-    # 3. If Clean and C -> Left
-    # 4. If Clean and B -> Random(Left, Right) [Simple Reflex cannot know history]
-    
     location, status = percept
     
     if status == 'Dirty':
@@ -80,7 +64,6 @@ def run_vacuum_simulation(steps=15):
     print("Performance Metric: Score = Sum(+10 per clean room) - 1(Move) - 2(Suck)")
     print("-" * 50)
     
-    # 1. Definition of Rule Table (Dictionary format for Display)
     rule_table = {
         ('Any', 'Dirty'): 'Suck',
         ('A', 'Clean'): 'Right',
