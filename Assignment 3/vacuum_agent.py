@@ -2,7 +2,6 @@ import random
 
 class VacuumEnvironment:
     def __init__(self):
-        # 0: Clean, 1: Dirty
         self.location_condition = {
             'A': random.randint(0, 1),
             'B': random.randint(0, 1),
