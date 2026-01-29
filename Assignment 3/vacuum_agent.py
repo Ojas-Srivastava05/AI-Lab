@@ -36,7 +36,7 @@ class VacuumEnvironment:
         else:
             print("Action: NoOp")
 
-        # +10 for every clean room
+
         clean_score = 0
         for loc in ['A', 'B', 'C']:
             if self.location_condition[loc] == 0:
@@ -46,7 +46,7 @@ class VacuumEnvironment:
 
 def simple_reflex_agent(percept):
     loc, status = percept
-    if status == 1: # Dirty
+    if status == 1:
         return 'Clean'
     
     if loc == 'A':
