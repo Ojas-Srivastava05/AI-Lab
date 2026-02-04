@@ -55,3 +55,41 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+"""
+# Assignment 3: Simple Reflex Agents Report
+
+## 1. Vacuum Cleaner Agent
+
+### Problem Statement
+A simple reflex agent navigating a three-room environment (A, B, C) to maintain cleanliness.
+
+### Rationality
+The rationality of the vacuum agent is defined by its ability to maximize its **Performance Score**.
+- **Percepts**: Current Location, Status of Current Room (Clean/Dirty).
+- **Actions**: Clean, Move Left, Move Right.
+- **Rational Action**: The agent chooses an action that is expected to maximize its future cumulative reward. For a simple reflex agent without state history:
+    - If Dirty, it *must* Clean (High Reward for Cleanliness).
+    - If Clean, it *must* Move to explore other rooms.
+
+### Performance Cost Definition
+We defined the performance metric ($P$) as:
+$$ P = \sum (\text{Clean Rooms} \times 10) - (\text{Move Cost} \times 1) - (\text{Cleaning Cost} \times 2) $$
+
+- **Reasoning**:
+    - **Cleanliness (+10)**: High reward ensures the primary goal is met.
+    - **Cleaning Cost (-2)**: Energy consumption for operation. Prevents cleaning in already clean rooms.
+    - **Move Cost (-1)**: Energy consumption for movement. Encourages efficiency.
+
+### Rule Table
+| Percept (Location, Status) | Action | Reasoning |
+| :--- | :--- | :--- |
+| `(Any, Dirty)` | **Clean** | Immediate priority to clean. |
+| `(A, Clean)` | **Right** | Only valid move from end room A. |
+| `(C, Clean)` | **Left** | Only valid move from end room C. |
+| `(B, Clean)` | **Random(Left, Right)** | Since the agent has no memory (Simple Reflex), it doesn't know where it came from. Random/Alternating is the rational choice to ensure eventual coverage of both A and C. |
+
+### Priorities
+Yes, strict priorities are encoded:
+1. **Cleaning (Dirty)** > **Moving**.
+"""
