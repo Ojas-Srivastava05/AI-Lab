@@ -1,77 +1,57 @@
 import random
 
-class VacuumEnvironment:
-    def __init__(self):
-        self.location_condition = {
-            'A': random.randint(0, 1),
-            'B': random.randint(0, 1),
-            'C': random.randint(0, 1)
-        }
-        self.agent_loc = random.choice(['A', 'B', 'C'])
-        self.score = 0
+RULES = {
+    ('A', 1): 'Clean',
+    ('A', 0): 'Right',
+    ('B', 1): 'Clean',
+    ('B', 0): 'Random',
+    ('C', 1): 'Clean',
+    ('C', 0): 'Left'
+}
 
-    def get_percept(self):
-        return (self.agent_loc, self.location_condition[self.agent_loc])
-
-    def step(self, action):
-        cost = 0
-        if action == 'Clean':
-            cost = -2
-            print(f"Action: CLEAN at {self.agent_loc}")
-            self.location_condition[self.agent_loc] = 0
-        elif action == 'Right':
-            cost = -1
-            print(f"Action: RIGHT from {self.agent_loc}")
-            if self.agent_loc == 'A': 
-                self.agent_loc = 'B'
-            elif self.agent_loc == 'B': 
-                self.agent_loc = 'C'
-        elif action == 'Left':
-            cost = -1
-            print(f"Action: LEFT from {self.agent_loc}")
-            if self.agent_loc == 'B': 
-                self.agent_loc = 'A'
-            elif self.agent_loc == 'C': 
-                self.agent_loc = 'B'
-        else:
-            print("Action: NoOp")
-
-
-        clean_score = 0
-        for loc in ['A', 'B', 'C']:
-            if self.location_condition[loc] == 0:
-                clean_score += 10
-        
-        self.score += (cost + clean_score)
-
-def simple_reflex_agent(percept):
-    loc, status = percept
-    if status == 1:
-        return 'Clean'
-    
-    if loc == 'A':
-        return 'Right'
-    elif loc == 'C':
-        return 'Left'
-    elif loc == 'B':
+def get_action(location, status):
+    if location == 'B' and status == 0:
         return random.choice(['Left', 'Right'])
-    return 'NoOp'
+    return RULES[(location, status)]
 
 def main():
-    env = VacuumEnvironment()
-    print("Initial State:", env.location_condition)
-    print("Agent Location:", env.agent_loc)
+    loc = input("Start Location (A, B, C): ").strip().upper()
     
-    steps = 15
+    print("Enter 1 for Dirty, 0 for Clean")
+    state = {
+        'A': int(input("Status A: ")),
+        'B': int(input("Status B: ")),
+        'C': int(input("Status C: "))
+    }
+    
+    steps = int(input("How many steps? "))
+    
+    print(f"\nSTARTING at {loc} with state {state}\n")
+    
     for i in range(steps):
-        print(f"\nStep {i+1}")
-        percept = env.get_percept()
-        action = simple_reflex_agent(percept)
-        env.step(action)
-        print("Current State:", env.location_condition)
-        print("Score:", env.score)
-    
-    print("\nFinal Score:", env.score)
+        is_dirty = state[loc]
+        print(f"Step {i+1} | Percept: ({loc}, {is_dirty})")
+
+        action = get_action(loc, is_dirty)
+        print(f"  -> Action: {action}")
+
+        if action == 'Clean':
+            state[loc] = 0
+        elif action == 'Right':
+            if loc == 'A': loc = 'B'
+            elif loc == 'B': loc = 'C'
+        elif action == 'Left':
+            if loc == 'B': loc = 'A'
+            elif loc == 'C': loc = 'B'
+        
+        print(f"  -> New Location: {loc} | State: {state}")
+
+        for room in state:
+            if state[room] == 0 and random.random() < 0.2:
+                state[room] = 1
+                print(f"     (Randomly: {room} became dirty)")
+        
+        print("-" * 30)
 
 if __name__ == "__main__":
     main()
