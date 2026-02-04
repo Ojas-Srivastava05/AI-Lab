@@ -1,5 +1,3 @@
-import heapq
-
 network = {
     "Chicago": [("Detroit", 283), ("Cleveland", 345), ("Indianapolis", 182)],
     "Indianapolis": [("Chicago", 182), ("Columbus", 176)],
@@ -61,26 +59,26 @@ def expand(problem, node):
 def best_first_search(problem, f):
     node = Node(state=problem.initial)
     frontier = []
-    heapq.heappush(frontier, (f(node), node))
+    frontier.append((f(node), node))
     
     reached = {problem.initial: node}
     
     nodes_explored_count = 0
 
     while frontier:
-        _, node = heapq.heappop(frontier)
+        frontier.sort(key=lambda x: x[0])
+        _, node = frontier.pop(0)
         
         nodes_explored_count += 1
         
         if problem.is_goal(node.state):
-            print(f"Goal Reached! Total nodes expanded: {nodes_explored_count}")
             return node, nodes_explored_count
         
         for child in expand(problem, node):
             s = child.state
             if s not in reached or child.path_cost < reached[s].path_cost:
                 reached[s] = child
-                heapq.heappush(frontier, (f(child), child))
+                frontier.append((f(child), child))
                 
     return None, nodes_explored_count
 
@@ -88,11 +86,10 @@ def compute_heuristic_table(graph, goal):
     h = {}
     pq = [(0, goal)]
     visited = set()
-
-    print("Computing Heuristic Table (getting min costs from Goal)...")
     
     while pq:
-        cost, u = heapq.heappop(pq)
+        pq.sort(key=lambda x: x[0])
+        cost, u = pq.pop(0)
         
         if u in visited:
             continue
@@ -101,16 +98,16 @@ def compute_heuristic_table(graph, goal):
         
         for v, edge_cost in graph.get(u, []):
             if v not in visited:
-                heapq.heappush(pq, (cost + edge_cost, v))
+                pq.append((cost + edge_cost, v))
                 
     return h
 
-def print_path(node):
+def get_path_string(node):
     path = []
     while node:
         path.append(node.state)
         node = node.parent
-    print(" -> ".join(reversed(path)))
+    return " -> ".join(reversed(path))
 
 def main():
     start_city = "Syracuse"
@@ -118,45 +115,26 @@ def main():
     
     heuristic_table = compute_heuristic_table(network, goal_city)
     
-    print("\nPrecomputed Heuristic Table (h values):")
+    print("\nHeuristic Table (h values):")
+    print("-" * 30)
     for city, val in sorted(heuristic_table.items()):
-        print(f"  h({city}) = {val}")
-    print("-" * 40)
+        print(f"{city:<15} : {val}")
+    print("-" * 30)
 
     problem = Problem(start_city, goal_city, network)
 
-    print("\nRunning Greedy Best First Search (f = h)...")
     def f_greedy(n):
         return heuristic_table.get(n.state, float('inf'))
         
     result_greedy, count_greedy = best_first_search(problem, f_greedy)
-    if result_greedy:
-        print("Path found:")
-        print_path(result_greedy)
-        print(f"Total Cost: {result_greedy.path_cost}")
-    else:
-        print("Failure")
-
-    print("-" * 40)
-
-    print("\nRunning A* Search (f = g + h)...")
-    def f_astar(n):
-        return n.path_cost + heuristic_table.get(n.state, float('inf'))
-
-    result_astar, count_astar = best_first_search(problem, f_astar)
-    if result_astar:
-        print("Path found:")
-        print_path(result_astar)
-        print(f"Total Cost: {result_astar.path_cost}")
-    else:
-        print("Failure")
+    path_greedy = get_path_string(result_greedy) if result_greedy else "No Path"
+    cost_greedy = result_greedy.path_cost if result_greedy else 0
     
-    print("-" * 40)
-    print("Comparison of Nodes Expanded:")
-    print(f"Greedy Best First Search: {count_greedy}")
-    print(f"A* Search:                {count_astar}")
-    print("Note: Since we used a perfect heuristic (actual shortest path distance),")
-    print("both algorithms find the optimal path very efficiently.")
+    print("\n" + "-" * 60)
+    print(f"{'Algorithm':<25} | {'Explored':<10} | {'Cost':<6} | {'Path'}")
+    print("-" * 60)
+    print(f"{'Greedy Best First Search':<25} | {count_greedy:<10} | {cost_greedy:<6} | {path_greedy}")
+    print("-" * 60)
 
 if __name__ == "__main__":
     main()

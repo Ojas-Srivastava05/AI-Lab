@@ -1,4 +1,3 @@
-import heapq
 import random
 
 class Node:
@@ -37,23 +36,39 @@ def print_grid(rows, cols, obstacles, start, end, path_map=None):
         print(line)
     print("-" * (cols * 3 + 2))
 
+def print_heuristic_grid(rows, cols, end):
+    print("\nHeuristic Table (Manhattan Distance to Goal):")
+    print("-" * (cols * 4 + 2))
+    for r in range(rows):
+        line = "|"
+        for c in range(cols):
+            h_val = get_manhattan_distance(r, c, end[0], end[1])
+            line += f" {h_val:2} "
+        line += "|"
+        print(line)
+    print("-" * (cols * 4 + 2))
+
 def main():
     try:
         print("Enter Grid Dimensions (rows cols): ")
-        rows, cols = map(int, input().split())
+        line1 = input().split()
+        if not line1: return
+        rows, cols = map(int, line1)
         
         print("Enter Start Coordinates (r c): ")
-        start_r, start_c = map(int, input().split())
+        line2 = input().split()
+        start_r, start_c = map(int, line2)
         start = (start_r, start_c)
         
         print("Enter End Coordinates (r c): ")
-        end_r, end_c = map(int, input().split())
+        line3 = input().split()
+        end_r, end_c = map(int, line3)
         end = (end_r, end_c)
         
         print("Enter Number of Obstacles: ")
-        num_obstacles = int(input())
+        line4 = input()
+        num_obstacles = int(line4)
     except ValueError:
-        print("Invalid input format.")
         return
 
     obstacles = set()
@@ -61,26 +76,23 @@ def main():
                      if (r, c) != start and (r, c) != end]
     
     if num_obstacles > len(possible_locs):
-        print("Too many obstacles for grid size!")
         num_obstacles = len(possible_locs)
         
     for pos in random.sample(possible_locs, num_obstacles):
         obstacles.add(pos)
 
-    print("\nInitial Grid Layout:")
-    print("S: Start, E: Exit, #: Wall/Obstacle, .: Empty")
+    print("\nInitial Grid:")
     print_grid(rows, cols, obstacles, start, end)
 
-    print("\nJustification for Evaluation Function:")
-    print("We use f(n) = g(n) + h(n) (A* Search).")
-    print("- g(n): Actual cost from start. We assume uniform cost (1) per step.")
-    print("- h(n): Manhattan distance. Since movement is restricted to 4 directions (up, down, left, right),")
-    print("  Manhattan distance is an admissible heuristic (never overestimates).")
-    print("  This guarantees the optimal (shortest) path for evacuation.")
+    print_heuristic_grid(rows, cols, end)
+
+    print("\nEvaluation Cost Function Justification:")
+    print("f(n) = g(n) + h(n), where g(n) is step cost (1) and h(n) is Manhattan distance.")
+    print("Manhattan distance is admissible for 4-directional grid movement, ensuring optimal path.")
     
     open_list = []
     start_node = Node(start[0], start[1], g=0, h=get_manhattan_distance(start[0], start[1], end[0], end[1]))
-    heapq.heappush(open_list, start_node)
+    open_list.append(start_node)
     
     visited = {}
     visited[start] = 0
@@ -92,7 +104,8 @@ def main():
     nodes_expanded = 0
 
     while open_list:
-        current = heapq.heappop(open_list)
+        open_list.sort() 
+        current = open_list.pop(0)
         nodes_expanded += 1
         
         if (current.r, current.c) == end:
@@ -109,22 +122,20 @@ def main():
                     visited[(nr, nc)] = new_g
                     h = get_manhattan_distance(nr, nc, end[0], end[1])
                     child = Node(nr, nc, g=new_g, h=h, parent=current, action=arrow)
-                    heapq.heappush(open_list, child)
+                    open_list.append(child)
 
     if final_node:
-        print(f"\nGoal Reached! Path Length: {final_node.g}")
-        print(f"Nodes Expanded: {nodes_expanded}")
-        
         path_map = {}
         curr = final_node
         while curr.parent:
             path_map[(curr.parent.r, curr.parent.c)] = curr.action
             curr = curr.parent
         
-        print("\nEvacuation Plan (Follow Arrows):")
+        print("\nEvacuation Plan:")
         print_grid(rows, cols, obstacles, start, end, path_map)
+        print(f"Path Length: {final_node.g}, Nodes Expanded: {nodes_expanded}")
     else:
-        print("\nNo path found! Evacuation path blocked.")
+        print("\nNo path found.")
 
 if __name__ == "__main__":
     main()
