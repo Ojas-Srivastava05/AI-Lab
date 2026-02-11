@@ -82,25 +82,6 @@ def best_first_search(problem, f):
                 
     return None, nodes_explored_count
 
-def compute_heuristic_table(graph, goal):
-    h = {}
-    pq = [(0, goal)]
-    visited = set()
-    
-    while pq:
-        pq.sort(key=lambda x: x[0])
-        cost, u = pq.pop(0)
-        
-        if u in visited:
-            continue
-        visited.add(u)
-        h[u] = cost
-        
-        for v, edge_cost in graph.get(u, []):
-            if v not in visited:
-                pq.append((cost + edge_cost, v))
-                
-    return h
 
 def get_path_string(node):
     path = []
@@ -113,27 +94,20 @@ def main():
     start_city = "Syracuse"
     goal_city = "Chicago"
     
-    heuristic_table = compute_heuristic_table(network, goal_city)
-    
-    print("\nHeuristic Table (h values):")
-    print("-" * 30)
-    for city, val in sorted(heuristic_table.items()):
-        print(f"{city:<15} : {val}")
-    print("-" * 30)
 
     problem = Problem(start_city, goal_city, network)
 
-    def f_greedy(n):
-        return heuristic_table.get(n.state, float('inf'))
-        
-    result_greedy, count_greedy = best_first_search(problem, f_greedy)
-    path_greedy = get_path_string(result_greedy) if result_greedy else "No Path"
-    cost_greedy = result_greedy.path_cost if result_greedy else 0
+    def f_cost(n):
+        return n.path_cost
+
+    result, count = best_first_search(problem, f_cost)
+    path = get_path_string(result) if result else "No Path"
+    cost = result.path_cost if result else 0
     
     print("\n" + "-" * 60)
     print(f"{'Algorithm':<25} | {'Explored':<10} | {'Cost':<6} | {'Path'}")
     print("-" * 60)
-    print(f"{'Greedy Best First Search':<25} | {count_greedy:<10} | {cost_greedy:<6} | {path_greedy}")
+    print(f"{'Best First Search':<25} | {count:<10} | {cost:<6} | {path}")
     print("-" * 60)
 
 if __name__ == "__main__":

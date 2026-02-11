@@ -13,8 +13,6 @@ class Node:
     def __lt__(self, other):
         return self.f < other.f
 
-def get_manhattan_distance(r1, c1, r2, c2):
-    return abs(r1 - r2) + abs(c1 - c2)
 
 def print_grid(rows, cols, obstacles, start, end, path_map=None):
     print("-" * (cols * 3 + 2))
@@ -36,17 +34,6 @@ def print_grid(rows, cols, obstacles, start, end, path_map=None):
         print(line)
     print("-" * (cols * 3 + 2))
 
-def print_heuristic_grid(rows, cols, end):
-    print("\nHeuristic Table (Manhattan Distance to Goal):")
-    print("-" * (cols * 4 + 2))
-    for r in range(rows):
-        line = "|"
-        for c in range(cols):
-            h_val = get_manhattan_distance(r, c, end[0], end[1])
-            line += f" {h_val:2} "
-        line += "|"
-        print(line)
-    print("-" * (cols * 4 + 2))
 
 def main():
     try:
@@ -84,14 +71,16 @@ def main():
     print("\nInitial Grid:")
     print_grid(rows, cols, obstacles, start, end)
 
-    print_heuristic_grid(rows, cols, end)
 
     print("\nEvaluation Cost Function Justification:")
-    print("f(n) = g(n) + h(n), where g(n) is step cost (1) and h(n) is Manhattan distance.")
-    print("Manhattan distance is admissible for 4-directional grid movement, ensuring optimal path.")
+    print("f(n) = g(n), where g(n) is the path cost.")
+    print("Best First Search (Uniform Cost) expands the node with the lowest path cost.")
+    
     
     open_list = []
-    start_node = Node(start[0], start[1], g=0, h=get_manhattan_distance(start[0], start[1], end[0], end[1]))
+    start_node = Node(start[0], start[1], g=0, h=0)
+    
+    start_node.f = start_node.g # f = g
     open_list.append(start_node)
     
     visited = {}
@@ -120,8 +109,10 @@ def main():
                 
                 if (nr, nc) not in visited or new_g < visited[(nr, nc)]:
                     visited[(nr, nc)] = new_g
-                    h = get_manhattan_distance(nr, nc, end[0], end[1])
+                    visited[(nr, nc)] = new_g
+                    h = 0
                     child = Node(nr, nc, g=new_g, h=h, parent=current, action=arrow)
+                    child.f = new_g # f = g
                     open_list.append(child)
 
     if final_node:
