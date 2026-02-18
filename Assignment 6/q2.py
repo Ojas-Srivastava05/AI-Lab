@@ -1,8 +1,6 @@
 
 import heapq
 
-# Maze Definition
-# 0: Empty, 1: Wall, 2: Start, 3: Reward
 maze = [
     [2, 0, 0, 0, 1],
     [0, 1, 0, 0, 3],
@@ -11,7 +9,6 @@ maze = [
     [3, 0, 0, 0, 3]
 ]
 
-# Heuristic: Manhattan distance to the nearest unvisited reward
 def heuristic(position, unvisited_rewards):
     if not unvisited_rewards:
         return 0
@@ -28,13 +25,13 @@ class State:
     def __init__(self, x, y, collected_rewards, parent=None, action=None, g=0):
         self.x = x
         self.y = y
-        self.collected_rewards = frozenset(collected_rewards) # Set of (x,y) tuples
+        self.collected_rewards = frozenset(collected_rewards)
         self.parent = parent
         self.action = action
         self.g = g
     
     def __lt__(self, other):
-        return self.g < other.g # Placeholder, logic handled in priority queue
+        return self.g < other.g
     
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y and self.collected_rewards == other.collected_rewards
@@ -52,7 +49,7 @@ def get_neighbors(state, maze_grid):
         nx, ny = state.x + dx, state.y + dy
         
         if 0 <= nx < rows and 0 <= ny < cols:
-            if maze_grid[nx][ny] != 1: # Not a wall
+            if maze_grid[nx][ny] != 1:
                 collected = set(state.collected_rewards)
                 if maze_grid[nx][ny] == 3:
                     collected.add((nx, ny))
@@ -77,8 +74,7 @@ def solve_maze_astar(maze_grid):
                 
     start_state = State(start_pos[0], start_pos[1], [])
     
-    frontier = [] # Priority Queue
-    # Priority is f(n) = g(n) + h(n)
+    frontier = []
     h_start = heuristic(start_pos, all_rewards)
     heapq.heappush(frontier, (h_start, start_state))
     
@@ -101,7 +97,6 @@ def solve_maze_astar(maze_grid):
             continue
         visited_states.add(current_state)
         
-        # Check Goal: All rewards collected
         if len(current_state.collected_rewards) == len(all_rewards):
             print("All rewards collected!")
             return current_state, visited_states
@@ -115,7 +110,6 @@ def solve_maze_astar(maze_grid):
             if next_state not in cost_so_far or new_cost < cost_so_far[next_state]:
                 cost_so_far[next_state] = new_cost
                 
-                # Heuristic for next state
                 next_pos = (next_state.x, next_state.y)
                 remaining_for_next = [r for r in all_rewards if r not in next_state.collected_rewards]
                 h = heuristic(next_pos, remaining_for_next)

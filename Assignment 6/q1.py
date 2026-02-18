@@ -1,7 +1,6 @@
 
 import heapq
 
-# City Map Graph (from Assignment 1 Q1)
 network = {
     "Chicago": [("Detroit", 283), ("Cleveland", 345), ("Indianapolis", 182)],
     "Indianapolis": [("Chicago", 182), ("Columbus", 176)],
@@ -19,7 +18,6 @@ network = {
     "Syracuse": [("Buffalo", 150), ("Boston", 312), ("Philadelphia", 253)]
 }
 
-# Heuristic values to Boston (from Assignment 6 Q1 PDF)
 heuristics = {
     "Boston": 0,
     "Providence": 50,
@@ -75,15 +73,13 @@ def greedy_best_first_search(graph, start, goal, h):
         if current == goal:
             break
         
-        # Greedy BFS usually doesn't revisit nodes to improve path, but handles cycles with visited
         if current in visited:
             continue
         visited.add(current)
         
-        # Determine neighbors
         neighbors = graph.get(current, [])
         for next_node, cost in neighbors:
-            if next_node not in visited and next_node not in came_from: # prevent cycles and re-exploration
+            if next_node not in visited and next_node not in came_from:
                 priority = h.get(next_node, float('inf'))
                 frontier.put(next_node, priority)
                 came_from[next_node] = current
@@ -106,7 +102,6 @@ def a_star_search(graph, start, goal, h):
         if current == goal:
             break
         
-        # Determine neighbors
         neighbors = graph.get(current, [])
         for next_node, cost in neighbors:
             new_cost = cost_so_far[current] + cost
@@ -125,13 +120,11 @@ def main():
     print(f"Goal: Reach {goal_city} from {start_city}")
     print("-" * 50)
     
-    # Run Greedy Best First Search
     print("Running Greedy Best First Search...")
     came_from_greedy, explored_greedy = greedy_best_first_search(network, start_city, goal_city, heuristics)
     if goal_city in came_from_greedy:
         path_greedy = reconstruct_path(came_from_greedy, start_city, goal_city)
         print(f"Path: {' -> '.join(path_greedy)}")
-        # Calculate cost for Greedy path just for info
         cost_greedy = 0
         for i in range(len(path_greedy)-1):
             u, v = path_greedy[i], path_greedy[i+1]
@@ -145,7 +138,6 @@ def main():
     print(f"Explored Nodes: {explored_greedy}")
     print("-" * 50)
     
-    # Run A* Search
     print("Running A* Search...")
     came_from_astar, explored_astar, costs_astar = a_star_search(network, start_city, goal_city, heuristics)
     if goal_city in came_from_astar:
@@ -157,7 +149,6 @@ def main():
     print(f"Explored Nodes: {explored_astar}")
     print("-" * 50)
 
-    # Comparison
     print("Comparison:")
     print(f"{'Algorithm':<25} | {'Explored Nodes':<15} | {'Path Cost':<10}")
     print("-" * 60)
