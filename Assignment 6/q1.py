@@ -57,17 +57,20 @@ def greedy_best_first_search(adj, start, goal, h):
     came_from[start] = None
     explored_nodes = 0
     visited = set()
+    visited_sequence = []
 
     while not frontier.empty():
         current = frontier.get()
         explored_nodes += 1
         
         if current == goal:
+            visited_sequence.append(current)
             break
         
         if current in visited:
             continue
         visited.add(current)
+        visited_sequence.append(current)
         
         for neighbor_idx, cost in enumerate(adj[current]):
             if cost > 0: 
@@ -76,7 +79,7 @@ def greedy_best_first_search(adj, start, goal, h):
                     frontier.put(neighbor_idx, priority)
                     came_from[neighbor_idx] = current
                 
-    return came_from, explored_nodes
+    return came_from, explored_nodes, visited_sequence
 
 def a_star_search(adj, start, goal, h):
     frontier = PriorityQueue()
@@ -86,10 +89,12 @@ def a_star_search(adj, start, goal, h):
     came_from[start] = None
     cost_so_far[start] = 0
     explored_nodes = 0
+    visited_sequence = []
     
     while not frontier.empty():
         current = frontier.get()
         explored_nodes += 1
+        visited_sequence.append(current)
         
         if current == goal:
             break
@@ -103,7 +108,7 @@ def a_star_search(adj, start, goal, h):
                     frontier.put(neighbor_idx, priority)
                     came_from[neighbor_idx] = current
                 
-    return came_from, explored_nodes, cost_so_far
+    return came_from, explored_nodes, cost_so_far, visited_sequence
 
 def main():
     start_city_name = "Chicago"
@@ -116,7 +121,7 @@ def main():
     print("-" * 50)
     
     print("Running Greedy Best First Search...")
-    came_from_greedy, explored_greedy = greedy_best_first_search(adj_matrix, start_index, goal_index, heuristics)
+    came_from_greedy, explored_greedy, visited_greedy = greedy_best_first_search(adj_matrix, start_index, goal_index, heuristics)
     if goal_index in came_from_greedy:
         path_indices = reconstruct_path(came_from_greedy, start_index, goal_index)
         path_names = [cities[i] for i in path_indices]
@@ -130,11 +135,14 @@ def main():
         print(f"Total Cost: {cost_greedy}")
     else:
         print("Path not found.")
+    
+    visited_names_greedy = [cities[i] for i in visited_greedy]
+    print(f"Visited Sequence: {visited_names_greedy}")
     print(f"Explored Nodes: {explored_greedy}")
     print("-" * 50)
     
     print("Running A* Search...")
-    came_from_astar, explored_astar, costs_astar = a_star_search(adj_matrix, start_index, goal_index, heuristics)
+    came_from_astar, explored_astar, costs_astar, visited_astar = a_star_search(adj_matrix, start_index, goal_index, heuristics)
     if goal_index in came_from_astar:
         path_indices_astar = reconstruct_path(came_from_astar, start_index, goal_index)
         path_names_astar = [cities[i] for i in path_indices_astar]
@@ -142,6 +150,9 @@ def main():
         print(f"Total Cost: {costs_astar[goal_index]}")
     else:
         print("Path not found.")
+    
+    visited_names_astar = [cities[i] for i in visited_astar]
+    print(f"Visited Sequence: {visited_names_astar}")
     print(f"Explored Nodes: {explored_astar}")
     print("-" * 50)
 
