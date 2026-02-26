@@ -5,8 +5,9 @@ def generate_random_board(n=8):
     return [random.randint(0, n - 1) for _ in range(n)]
 
 
-def heuristic(board):
+def value_function(board):
     n = len(board)
+    total_pairs = n * (n - 1) // 2
     conflicts = 0
     for i in range(n):
         for j in range(i + 1, n):
@@ -14,19 +15,20 @@ def heuristic(board):
                 conflicts += 1
             if abs(board[i] - board[j]) == abs(i - j):
                 conflicts += 1
-    return conflicts
+    return total_pairs - conflicts
 
 
 def steepest_ascent_hill_climbing(board):
     n = len(board)
+    max_value = n * (n - 1) // 2
     current = list(board)
-    current_h = heuristic(current)
-    initial_h = current_h
+    current_val = value_function(current)
+    initial_val = current_val
     steps = 0
 
     while True:
         best_neighbor = None
-        best_h = current_h
+        best_val = current_val
 
         for col in range(n):
             original_row = current[col]
@@ -34,9 +36,9 @@ def steepest_ascent_hill_climbing(board):
                 if row == original_row:
                     continue
                 current[col] = row
-                neighbor_h = heuristic(current)
-                if neighbor_h < best_h:
-                    best_h = neighbor_h
+                neighbor_val = value_function(current)
+                if neighbor_val > best_val:
+                    best_val = neighbor_val
                     best_neighbor = list(current)
                 current[col] = original_row
 
@@ -44,12 +46,12 @@ def steepest_ascent_hill_climbing(board):
             break
 
         current = best_neighbor
-        current_h = best_h
+        current_val = best_val
         steps += 1
 
-    final_h = current_h
-    solved = (final_h == 0)
-    return current, initial_h, final_h, steps, solved
+    final_val = current_val
+    solved = (final_val == max_value)
+    return current, initial_val, final_val, steps, solved
 
 
 def main():
@@ -59,22 +61,22 @@ def main():
     print("=" * 75)
     print("  8-Queens: Steepest-Ascent Hill Climbing — 50 Random Boards")
     print("=" * 75)
-    print(f"{'Trial':<7} {'Initial h':<12} {'Final h':<10} {'Steps':<8} {'Status'}")
+    print(f"{'Trial':<7} {'Init Value':<12} {'Final Value':<12} {'Steps':<8} {'Status'}")
     print("-" * 75)
 
     for i in range(num_trials):
         board = generate_random_board()
-        final_board, initial_h, final_h, steps, solved = steepest_ascent_hill_climbing(board)
+        final_board, initial_val, final_val, steps, solved = steepest_ascent_hill_climbing(board)
         status = "SOLVED" if solved else "FAIL"
         results.append({
             'trial': i + 1,
-            'initial_h': initial_h,
-            'final_h': final_h,
+            'initial_val': initial_val,
+            'final_val': final_val,
             'steps': steps,
             'solved': solved,
             'final_board': final_board
         })
-        print(f"{i + 1:<7} {initial_h:<12} {final_h:<10} {steps:<8} {status}")
+        print(f"{i + 1:<7} {initial_val:<12} {final_val:<12} {steps:<8} {status}")
 
     solved_count = sum(1 for r in results if r['solved'])
     failed_count = num_trials - solved_count
@@ -104,38 +106,38 @@ def main():
     if failed_cases:
         example = failed_cases[0]
         board = example['final_board']
-        h_val = example['final_h']
+        val = example['final_val']
         n = len(board)
+        max_val = n * (n - 1) // 2
 
         print(f"\n  Example failed board (Trial {example['trial']}):")
         print(f"  Board : {board}")
-        print(f"  h(board) = {h_val} (non-zero, so NOT a solution)")
+        print(f"  Value = {val} (Total pairs is {max_val}, so NOT a solution)")
 
         all_neighbors_worse_or_equal = True
-        neighbor_h_values = []
+        neighbor_values = []
         for col in range(n):
             original_row = board[col]
             for row in range(n):
                 if row == original_row:
                     continue
                 board[col] = row
-                nh = heuristic(board)
-                neighbor_h_values.append(nh)
-                if nh < h_val:
+                nv = value_function(board)
+                neighbor_values.append(nv)
+                if nv > val:
                     all_neighbors_worse_or_equal = False
                 board[col] = original_row
 
-        print(f"\n  Total neighbors evaluated : {len(neighbor_h_values)}")
-        print(f"  Min neighbor h           : {min(neighbor_h_values)}")
-        print(f"  Max neighbor h           : {max(neighbor_h_values)}")
-        print(f"  Current h                : {h_val}")
-        print(f"  All neighbors >= current : {all_neighbors_worse_or_equal}")
+        print(f"\n  Total neighbors evaluated : {len(neighbor_values)}")
+        print(f"  Max neighbor value       : {max(neighbor_values)}")
+        print(f"  Current value            : {val}")
+        print(f"  All neighbors <= current : {all_neighbors_worse_or_equal}")
 
-        if all_neighbors_worse_or_equal and h_val > 0:
-            print("\n  LOCAL MINIMUM CONFIRMED!")
-            print(f"  The board is stuck at h = {h_val}. No single-queen move")
-            print("  can reduce the number of conflicts. This is a local minimum")
-            print("  because the state is NOT a global minimum (h = 0) but no")
+        if all_neighbors_worse_or_equal and val < max_val:
+            print("\n  LOCAL MAXIMUM CONFIRMED!")
+            print(f"  The board is stuck at value = {val}. No single-queen move")
+            print("  can increase the number of non-attacking pairs. This is a local maximum")
+            print("  because the state is NOT a global maximum (28) but no")
             print("  neighbor is strictly better.")
         print()
 
@@ -150,7 +152,6 @@ def main():
             print(line)
     else:
         print("\n  All trials solved — no local minimum encountered in this run.")
-        print("  (This is extremely unlikely; re-run to observe local minima.)")
 
     print()
 
