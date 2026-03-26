@@ -3,7 +3,6 @@ def is_goal(state):
     return dirt_A == 'Clean' and dirt_B == 'Clean'
 
 def get_actions(state):
-    # In any state, agent can Move Left, Move Right, or Suck
     return ['Left', 'Right', 'Suck']
 
 def get_results(state, action):
@@ -19,27 +18,17 @@ def get_results(state, action):
         results = set()
         if loc == 'A':
             if dirt_A == 'Dirty':
-                # Normal: cleans A
                 results.add(('A', 'Clean', dirt_B))
-                # Erratic: also cleans B
                 results.add(('A', 'Clean', 'Clean'))
             else:
-                # loc is Clean
-                # Normal: stays clean
                 results.add(('A', 'Clean', dirt_B))
-                # Erratic: deposits dirt
                 results.add(('A', 'Dirty', dirt_B))
         elif loc == 'B':
             if dirt_B == 'Dirty':
-                # Normal: cleans B
                 results.add(('B', dirt_A, 'Clean'))
-                # Erratic: also cleans A
                 results.add(('B', 'Clean', 'Clean'))
             else:
-                # loc is Clean
-                # Normal: stays clean
                 results.add(('B', dirt_A, 'Clean'))
-                # Erratic: deposits dirt
                 results.add(('B', dirt_A, 'Dirty'))
         return results
 
@@ -62,7 +51,6 @@ def or_search(state, path):
     for action in get_actions(state):
         results = get_results(state, action)
         
-        # Don't try an action if it only leads to the exact same state (to avoid simple loops)
         if len(results) == 1 and state in results:
             continue
             
@@ -92,7 +80,7 @@ def print_plan(plan, indent=""):
 def main():
     print("Erratic Vacuum Agent AND-OR Graph Search\n")
     
-    # Generate all possible non-goal initial states to test
+
     locations = ['A', 'B']
     statuses = ['Clean', 'Dirty']
     
