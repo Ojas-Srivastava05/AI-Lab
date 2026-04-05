@@ -50,7 +50,7 @@ def newton_raphson_update(cluster_data, current_center):
     grad_x = sum(2 * (cx - p[0]) for p in cluster_data)
     grad_y = sum(2 * (cy - p[1]) for p in cluster_data)
     
-    # Hessian is diag(2n, 2n)
+
     hessian_inv_x = 1.0 / (2 * n)
     hessian_inv_y = 1.0 / (2 * n)
     
