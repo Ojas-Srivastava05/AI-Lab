@@ -1,6 +1,12 @@
-from itertools import permutations
+def get_permutations(elements, r):
+    if r == 0:
+        yield ()
+        return
+    for i in range(len(elements)):
+        for p in get_permutations(elements[:i] + elements[i+1:], r - 1):
+            yield (elements[i],) + p
 
-for p in permutations(range(10), 8):
+for p in get_permutations(tuple(range(10)), 8):
     s, e, n, d, m, o, r, y = p
     if s == 0 or m == 0:
         continue
