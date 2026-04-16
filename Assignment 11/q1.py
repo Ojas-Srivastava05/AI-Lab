@@ -6,7 +6,7 @@ districts = [
     "Narmada", "Surat", "Tapi", "Navsari", "Dangs", "Valsad"
 ]
 
-colors = ["Red", "Green", "Blue", "Yellow"]
+colors = ["Red", "Green","Blue"]
 
 adjacency = {
     "Kuchchh": ["Banaskantha", "Patan", "Surendranagar", "Rajkot", "Jamnagar"],
