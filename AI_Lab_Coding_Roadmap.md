@@ -4,6 +4,40 @@ A foolproof, step-by-step roadmap to mastering the "crux coding" for all your AI
 
 ---
 
+## 📚 Categorization of Assignments by Topic
+
+Here is the exact breakdown of every assignment listed by its overarching AI concept. Use this index to map the concepts to your laboratory file directory:
+
+**1. Fundamentals**
+* **Assignment 1:** Python Basics and Syntax Recap.
+* **Assignment 3:** Intelligent Agents (Reflex Agent, Vacuum Agent, Railway Agent).
+
+**2. Uninformed (Blind) Search**
+* **Assignment 2:** Breadth-First Search (BFS), Depth-First Search (DFS), 8-Puzzle Problem.
+* **Assignment 5:** Depth-Limited Search (DLS), Iterative Deepening Search (IDS).
+
+**3. Informed (Heuristic) Search**
+* **Assignment 4:** Best-First Search, A* Search (Grid Traversal).
+* **Assignment 6:** Greedy Best-First Search, A* Search (Maze Pathfinding).
+
+**4. Local Search & Optimization (Metaheuristics)**
+* **Assignment 7:** Hill Climbing (Steepest Ascent, First Choice, Random Restart), Simulated Annealing.
+* **Assignment 8:** Local Beam Search, Genetic Algorithms (Traveling Salesperson Problem).
+
+**5. Adversarial Search (Games)**
+* **Assignment 9:** Minimax Algorithm, Alpha-Beta Pruning (Tic-Tac-Toe).
+
+**6. Constraint Satisfaction Problems (CSP) & Clustering**
+* **Assignment 10:** K-Means Clustering (Q1), AND/OR Graph Search Environments (Q2).
+* **Assignment 11:** Backtracking Search (Map Coloring).
+* **Assignment 12:** AC-3 Algorithm (Arc Consistency & Sudoku Domains).
+
+**7. Logic, Reasoning, and Inference**
+* **Assignment 13:** Propositional Logic (Parsing variables, Truth Table generation).
+* **Assignment 14:** Forward Chaining, Backward Chaining, and Resolution.
+
+---
+
 ## Part 1: Blind Search Algorithms
 **Assignments covered: Assignment 2 (Q1, Q2), Assignment 5 (Q1)**
 *The core logic here revolves around maintaining a "frontier" (a list of nodes to explore next) and an explored set.*
